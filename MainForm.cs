@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace FaceRecogniser
 {
-    public partial class FrmPrincipal : Form
+    public partial class MainForm : Form
     {
         Image<Bgr, Byte> currentFrame;
         Capture grabber;
@@ -24,16 +24,16 @@ namespace FaceRecogniser
         List<string> NamePersons = new List<string>();
         int ContTrain, NumLabels, t;
         string name, names = null;
+        EventHandler IdleEvenHandler;
 
-
-        public FrmPrincipal()
+        public MainForm()
         {
             InitializeComponent();
             //Load haarcascades for face detection
             face = new HaarCascade("haarcascade_frontalface_default.xml");
             try
             {
-                //Load of previus trainned faces and labels for each image
+                //Load of previous trainned faces and labels for each image
                 string Labelsinfo = File.ReadAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt");
                 string[] Labels = Labelsinfo.Split('%');
                 NumLabels = Convert.ToInt16(Labels[0]);
@@ -56,18 +56,28 @@ namespace FaceRecogniser
         }
 
 
-        private void button1_Click(object sender, EventArgs e)
+        private void RunButton_Click(object sender, EventArgs e)
         {
             //Initialize the capture device
             grabber = new Capture();
             grabber.QueryFrame();
             //Initialize the FrameGraber event
-            Application.Idle += new EventHandler(FrameGrabber);
-            button1.Enabled = false;
+            Application.Idle += IdleEvenHandler = new EventHandler(FrameGrabber);
+            RunButton.Enabled = false;
+            StopButton.Enabled = true;
         }
 
+        private void StopButton_Click(object sender, EventArgs e)
+        {
+            Application.Idle -= IdleEvenHandler;
+            grabber.Dispose();
+            imageBoxFrameGrabber.Image = null;
+          
+            RunButton.Enabled = true;
+            StopButton.Enabled = false;
+        }
 
-        private void button2_Click(object sender, System.EventArgs e)
+        private void AddFaceButton_Click(object sender, System.EventArgs e)
         {
             try
             {
@@ -96,10 +106,10 @@ namespace FaceRecogniser
                 //test image with cubic interpolation type method
                 TrainedFace = result.Resize(100, 100, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
                 trainingImages.Add(TrainedFace);
-                labels.Add(textBox1.Text);
+                labels.Add(AddNameTextBox.Text);
 
                 //Show face added in gray scale
-                imageBox1.Image = TrainedFace;
+                AddFaceImgBox.Image = TrainedFace;
 
                 //Write the number of triained faces in a file text for further load
                 File.WriteAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt", trainingImages.ToArray().Length.ToString() + "%");
@@ -111,7 +121,7 @@ namespace FaceRecogniser
                     File.AppendAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt", labels.ToArray()[i - 1] + "%");
                 }
 
-                MessageBox.Show(textBox1.Text + "´s face detected and added :)", "Training OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(AddNameTextBox.Text + "´s face detected and added :)", "Training OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch
             {
@@ -122,16 +132,16 @@ namespace FaceRecogniser
 
         void FrameGrabber(object sender, EventArgs e)
         {
-            label3.Text = "0";
+            AmountCounter.Text = "0";
             //label4.Text = "";
             NamePersons.Add("");
 
 
             //Get the current frame form capture device
-            currentFrame = grabber.QueryFrame().Resize(320, 240, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
+            currentFrame = grabber.QueryFrame().Resize(640, 480, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
 
-                    //Convert it to Grayscale
-                    gray = currentFrame.Convert<Gray, Byte>();
+            //Convert it to Grayscale
+            gray = currentFrame.Convert<Gray, Byte>();
 
                     //Face Detector
                     MCvAvgComp[][] facesDetected = gray.DetectHaarCascade(
@@ -174,7 +184,7 @@ namespace FaceRecogniser
 
 
                         //Set the number of faces detected on the scene
-                        label3.Text = facesDetected[0].Length.ToString();
+                        AmountCounter.Text = facesDetected[0].Length.ToString();
                        
                     }
                         t = 0;

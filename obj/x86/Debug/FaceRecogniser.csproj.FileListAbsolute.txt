@@ -12,3 +12,17 @@ C:\Git\FaceRecogniser\obj\x86\Debug\MultiFaceRec.exe
 C:\Git\FaceRecogniser\obj\x86\Debug\MultiFaceRec.pdb
 C:\Git\FaceRecogniser\obj\x86\Debug\FaceRecogniser.csprojResolveAssemblyReference.cache
 C:\Git\FaceRecogniser\bin\Debug\MultiFaceRec.exe.config
+C:\Git\FaceRecogniser\FaceRecogniser\bin\Debug\MultiFaceRec.exe.config
+C:\Git\FaceRecogniser\FaceRecogniser\bin\Debug\MultiFaceRec.exe
+C:\Git\FaceRecogniser\FaceRecogniser\bin\Debug\MultiFaceRec.pdb
+C:\Git\FaceRecogniser\FaceRecogniser\bin\Debug\Emgu.CV.xml
+C:\Git\FaceRecogniser\FaceRecogniser\bin\Debug\Emgu.CV.UI.xml
+C:\Git\FaceRecogniser\FaceRecogniser\bin\Debug\Emgu.Util.xml
+C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\FaceRecogniser.csprojResolveAssemblyReference.cache
+C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\MultiFaceRec.Properties.Resources.resources
+C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\FaceRecogniser.csproj.GenerateResource.cache
+C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\FaceRecogniser.csproj.CoreCompileInputs.cache
+C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\FaceRecogniser.csproj.CopyComplete
+C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\MultiFaceRec.exe
+C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\MultiFaceRec.pdb
+C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\FaceRecogniser.MainForm.resources
