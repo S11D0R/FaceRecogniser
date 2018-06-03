@@ -8,6 +8,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using System.IO;
 using System.Diagnostics;
+using MultiFaceRec;
 
 namespace FaceRecogniser
 {
@@ -79,6 +80,9 @@ namespace FaceRecogniser
 
         private void AddFaceButton_Click(object sender, System.EventArgs e)
         {
+            var tForm = new TrainingForm(this);
+            tForm.Show();
+            /* 
             try
             {
                 //Trained face counter
@@ -127,6 +131,7 @@ namespace FaceRecogniser
             {
                 MessageBox.Show("Enable the face detection first", "Training Fail", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+            */
         }
 
 
