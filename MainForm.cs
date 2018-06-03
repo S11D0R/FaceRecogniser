@@ -8,23 +8,18 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using System.IO;
 using System.Diagnostics;
-using MultiFaceRec;
+using FaceRecogniser;
 
 namespace FaceRecogniser
 {
     public partial class MainForm : Form
     {
-        Image<Bgr, Byte> currentFrame;
         Capture grabber;
         HaarCascade face;
-        MCvFont font = new MCvFont(FONT.CV_FONT_HERSHEY_TRIPLEX, 0.5d, 0.5d);
-        Image<Gray, byte> result, TrainedFace = null;
-        Image<Gray, byte> gray = null;
         List<Image<Gray, byte>> trainingImages = new List<Image<Gray, byte>>();
         List<string> labels= new List<string>();
-        List<string> NamePersons = new List<string>();
-        int ContTrain, NumLabels, t;
-        string name, names = null;
+        
+        int NumLabels, t;
         EventHandler IdleEvenHandler;
 
         public MainForm()
@@ -38,7 +33,7 @@ namespace FaceRecogniser
                 string Labelsinfo = File.ReadAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt");
                 string[] Labels = Labelsinfo.Split('%');
                 NumLabels = Convert.ToInt16(Labels[0]);
-                ContTrain = NumLabels;
+                //ContTrain = NumLabels;
                 string LoadFaces;
 
                 for (int tf = 1; tf < NumLabels+1; tf++)
@@ -63,23 +58,20 @@ namespace FaceRecogniser
             grabber = new Capture();
             grabber.QueryFrame();
             //Initialize the FrameGraber event
-            Application.Idle += IdleEvenHandler = new EventHandler(FrameGrabber);
+            FrameGrabber grabberHandler = new FrameGrabber(grabber, face, trainingImages, NumLabels, labels, this);
+            Application.Idle += IdleEvenHandler = new EventHandler(grabberHandler.StartGrabber);
             RunButton.Enabled = false;
             StopButton.Enabled = true;
         }
 
         private void StopButton_Click(object sender, EventArgs e)
         {
-            Application.Idle -= IdleEvenHandler;
-            grabber.Dispose();
-            imageBoxFrameGrabber.Image = null;
-          
-            RunButton.Enabled = true;
-            StopButton.Enabled = false;
+            StopRecogniser();
         }
 
         private void AddFaceButton_Click(object sender, System.EventArgs e)
         {
+            if (StopButton.Enabled) StopRecogniser();
             var tForm = new TrainingForm(this);
             tForm.Show();
             /* 
@@ -134,7 +126,7 @@ namespace FaceRecogniser
             */
         }
 
-
+        /*
         void FrameGrabber(object sender, EventArgs e)
         {
             AmountCounter.Text = "0";
@@ -207,6 +199,27 @@ namespace FaceRecogniser
                     NamePersons.Clear();
 
                 }
+        */
 
+        public void SetAmount(string am)
+        {
+            AmountCounter.Text = am;
+        }
+
+        public void UpdateForm(Image<Bgr, Byte> cFrame, string sNames)
+        {
+            imageBoxFrameGrabber.Image = cFrame;
+            label4.Text = sNames;
+        }
+
+        public void StopRecogniser()
+        {
+            Application.Idle -= IdleEvenHandler;
+            grabber.Dispose();
+            imageBoxFrameGrabber.Image = null;
+
+            RunButton.Enabled = true;
+            StopButton.Enabled = false;
+        }
     }
 }

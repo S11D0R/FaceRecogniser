@@ -1,4 +1,4 @@
-﻿namespace MultiFaceRec
+﻿namespace FaceRecogniser
 {
     partial class TrainingForm
     {
@@ -32,6 +32,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TrainingForm));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.TraningGroupBox = new System.Windows.Forms.GroupBox();
+            this.AmountCounter = new System.Windows.Forms.Label();
+            this.AmountCounterLabel = new System.Windows.Forms.Label();
             this.CancelTrainingButton = new System.Windows.Forms.Button();
             this.StartTrainingButton = new System.Windows.Forms.Button();
             this.IntructionTextBox = new System.Windows.Forms.TextBox();
@@ -73,6 +75,8 @@
             // 
             // TraningGroupBox
             // 
+            this.TraningGroupBox.Controls.Add(this.AmountCounter);
+            this.TraningGroupBox.Controls.Add(this.AmountCounterLabel);
             this.TraningGroupBox.Controls.Add(this.CancelTrainingButton);
             this.TraningGroupBox.Controls.Add(this.StartTrainingButton);
             this.TraningGroupBox.Controls.Add(this.IntructionTextBox);
@@ -82,6 +86,24 @@
             this.TraningGroupBox.TabIndex = 1;
             this.TraningGroupBox.TabStop = false;
             this.TraningGroupBox.Text = "Add new user";
+            // 
+            // AmountCounter
+            // 
+            this.AmountCounter.AutoSize = true;
+            this.AmountCounter.Location = new System.Drawing.Point(116, 311);
+            this.AmountCounter.Name = "AmountCounter";
+            this.AmountCounter.Size = new System.Drawing.Size(35, 13);
+            this.AmountCounter.TabIndex = 12;
+            this.AmountCounter.Text = "label2";
+            // 
+            // AmountCounterLabel
+            // 
+            this.AmountCounterLabel.AutoSize = true;
+            this.AmountCounterLabel.Location = new System.Drawing.Point(6, 311);
+            this.AmountCounterLabel.Name = "AmountCounterLabel";
+            this.AmountCounterLabel.Size = new System.Drawing.Size(104, 13);
+            this.AmountCounterLabel.TabIndex = 11;
+            this.AmountCounterLabel.Text = "Faces on the scene:";
             // 
             // CancelTrainingButton
             // 
@@ -188,5 +210,7 @@
         private System.Windows.Forms.GroupBox TraningGroupBox;
         private System.Windows.Forms.Button CancelTrainingButton;
         private System.Windows.Forms.Button StartTrainingButton;
+        private System.Windows.Forms.Label AmountCounter;
+        private System.Windows.Forms.Label AmountCounterLabel;
     }
 }

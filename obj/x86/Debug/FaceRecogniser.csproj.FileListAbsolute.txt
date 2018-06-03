@@ -26,4 +26,4 @@ C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\FaceRecogniser.csproj.CopyCom
 C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\MultiFaceRec.exe
 C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\MultiFaceRec.pdb
 C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\FaceRecogniser.MainForm.resources
-C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\MultiFaceRec.TrainingForm.resources
+C:\Git\FaceRecogniser\FaceRecogniser\obj\x86\Debug\FaceRecogniser.TrainingForm.resources

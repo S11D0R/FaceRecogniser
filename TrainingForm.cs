@@ -9,12 +9,12 @@ using System.Windows.Forms;
 using Emgu.CV;
 using FaceRecogniser;
 
-namespace MultiFaceRec
+namespace FaceRecogniser
 {
     public partial class TrainingForm : Form
     {
         private MainForm MainFormPtr;
-        private Capture grabber;
+        private Capture TrainingGrabber;
 
         public TrainingForm(MainForm f)
         {
@@ -26,10 +26,10 @@ namespace MultiFaceRec
         private void InitializeGrabber()
         {
             //Initialize the capture device
-            grabber = new Capture();
-            grabber.QueryFrame();
+            TrainingGrabber = new Capture();
+            TrainingGrabber.QueryFrame();
             //Initialize the FrameGraber event
-            Application.Idle += IdleEvenHandler = new EventHandler(FrameGrabber);
+            //Application.Idle += IdleEvenHandler = new EventHandler(TrainingGrabber);
             
         }
 
