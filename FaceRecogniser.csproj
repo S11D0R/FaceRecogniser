@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="EigenObjectRecognizer.cs" />
     <Compile Include="FrameGrabber.cs" />
+    <Compile Include="FrameInfo.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

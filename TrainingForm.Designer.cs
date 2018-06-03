@@ -125,6 +125,7 @@
             this.StartTrainingButton.TabIndex = 9;
             this.StartTrainingButton.Text = "Start";
             this.StartTrainingButton.UseVisualStyleBackColor = true;
+            this.StartTrainingButton.Click += new System.EventHandler(this.StartTrainingButton_Click);
             // 
             // IntructionTextBox
             // 

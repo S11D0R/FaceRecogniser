@@ -18,7 +18,7 @@ namespace FaceRecogniser
         private Image<Gray, byte> TrainedFace = null;
         private Image<Gray, byte> gray = null;
         private List<Image<Gray, byte>> trainingImages = new List<Image<Gray, byte>>();
-        private List<string> labels= new List<string>();
+        private List<string> labels = new List<string>();
         private List<string> NamePersons = new List<string>();
         private int ContTrain;
         private int NumLabels;
@@ -86,13 +86,13 @@ namespace FaceRecogniser
 
                 }
 
-                NamePersons[t-1] = name;
+                NamePersons[t - 1] = name;
                 NamePersons.Add("");
 
 
                 //Set the number of faces detected on the scene
                 _mainForm.SetAmount(facesDetected[0].Length.ToString());
-                       
+
             }
             t = 0;
 
@@ -102,7 +102,7 @@ namespace FaceRecogniser
                 names = names + NamePersons[nnn] + ", ";
             }
             //Show the faces procesed and recognized
-            _mainForm.UpdateForm(currentFrame,names);
+            _mainForm.UpdateForm(currentFrame, names);
             names = "";
             //Clear the list(vector) of names
             NamePersons.Clear();
