@@ -38,7 +38,7 @@ namespace FaceRecogniser
             //Initialize the capture device
             TrainingGrabber = new Capture();
             tCapture = new TrainingCapture(TrainingGrabber, face, trainingImages, NumLabels, labels, this);
-            //StartCapture();
+            StartCapture();
         }
 
         private void StartCapture()
