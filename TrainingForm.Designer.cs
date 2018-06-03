@@ -90,18 +90,21 @@
             // AmountCounter
             // 
             this.AmountCounter.AutoSize = true;
-            this.AmountCounter.Location = new System.Drawing.Point(116, 311);
+            this.AmountCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.AmountCounter.ForeColor = System.Drawing.Color.Red;
+            this.AmountCounter.Location = new System.Drawing.Point(147, 323);
             this.AmountCounter.Name = "AmountCounter";
-            this.AmountCounter.Size = new System.Drawing.Size(35, 13);
+            this.AmountCounter.Size = new System.Drawing.Size(15, 15);
             this.AmountCounter.TabIndex = 12;
-            this.AmountCounter.Text = "label2";
+            this.AmountCounter.Text = "0";
             // 
             // AmountCounterLabel
             // 
             this.AmountCounterLabel.AutoSize = true;
-            this.AmountCounterLabel.Location = new System.Drawing.Point(6, 311);
+            this.AmountCounterLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.AmountCounterLabel.Location = new System.Drawing.Point(6, 323);
             this.AmountCounterLabel.Name = "AmountCounterLabel";
-            this.AmountCounterLabel.Size = new System.Drawing.Size(104, 13);
+            this.AmountCounterLabel.Size = new System.Drawing.Size(135, 15);
             this.AmountCounterLabel.TabIndex = 11;
             this.AmountCounterLabel.Text = "Faces on the scene:";
             // 

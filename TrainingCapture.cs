@@ -102,7 +102,7 @@ namespace FaceRecogniser
                 names = names + NamePersons[nnn] + ", ";
             }
             //Show the faces procesed and recognized
-            _trainingForm.UpdateForm(currentFrame, names);
+            _trainingForm.UpdateForm(currentFrame);
             names = "";
             //Clear the list(vector) of names
             NamePersons.Clear();

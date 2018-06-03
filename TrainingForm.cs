@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Emgu.CV;
+using Emgu.CV.Structure;
 using FaceRecogniser;
 
 namespace FaceRecogniser
@@ -28,11 +29,18 @@ namespace FaceRecogniser
             //Initialize the capture device
             TrainingGrabber = new Capture();
             TrainingGrabber.QueryFrame();
-            //Initialize the FrameGraber event
-            //Application.Idle += IdleEvenHandler = new EventHandler(TrainingGrabber);
+            
             
         }
 
-       
+        public void SetAmount(string am)
+        {
+            AmountCounter.Text = am;
+        }
+
+        public void UpdateForm(Image<Bgr, Byte> cFrame)
+        {
+            imageBoxFrameGrabber.Image = cFrame;
+        }
     }
 }
