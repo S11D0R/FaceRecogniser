@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using FaceRecogniser;
@@ -22,10 +23,11 @@ namespace FaceRecogniser
         private List<Image<Gray, byte>> trainingImages = new List<Image<Gray, byte>>();
         private List<string> labels = new List<string>();
         private int NumLabels, t;
-        
 
+        private bool captureAllowed = true;
         private const int TrainingSetMax = 50;
 
+        EventHandler IdleEvenHandler;
         public TrainingForm(MainForm f)
         {
             InitializeComponent();
@@ -43,8 +45,7 @@ namespace FaceRecogniser
 
         private void StartCapture()
         {
-
-            tCapture.StartCapture();
+            Application.Idle += IdleEvenHandler = new EventHandler(tCapture.StartVoidCapture);
         }
 
         public void SetAmount(string am)
@@ -54,6 +55,7 @@ namespace FaceRecogniser
 
         private void StartTrainingButton_Click(object sender, EventArgs e)
         {
+            captureAllowed = false;
             FrameInfo fInfo = new FrameInfo();
             Image<Gray, byte> gray = null;
             int ContTrain;
@@ -62,12 +64,22 @@ namespace FaceRecogniser
             Image<Bgr, Byte> currentFrame;
             for (int k = 0; k < TrainingSetMax; k++)
             {
+
                 fInfo = tCapture.StartCapture();
                 ContTrain = fInfo.getNumLabels();
                 result = fInfo.getResult();
                 currentFrame = fInfo.getCurrentFrame();
-                if (fInfo.AllowTraining())
+                //if (fInfo.AllowTraining() == false) break;
+                while (fInfo.AllowTraining() == false)
                 {
+                    System.Threading.Thread.Sleep(5);
+                    fInfo = tCapture.StartCapture();
+                    ContTrain = fInfo.getNumLabels();
+                    result = fInfo.getResult();
+                    currentFrame = fInfo.getCurrentFrame();
+                }
+
+                FieldLight(k);
                     try
                     {
                         //Trained face counter
@@ -112,7 +124,7 @@ namespace FaceRecogniser
                     {
                         MessageBox.Show("Enable the face detection first", "Training Fail", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     }
-                }
+                
 
 
             }
@@ -121,6 +133,44 @@ namespace FaceRecogniser
         public void UpdateForm(Image<Bgr, Byte> cFrame)
         {
             imageBoxFrameGrabber.Image = cFrame;
+        }
+
+        private void FieldLight(int iter)
+        {
+            switch (iter)
+            {
+                case 10:
+                    LeftArrowPicture.BackColor = Color.Red;
+                    RightArrowPicture.BackColor = Color.White;
+                    TopArrowPicture.BackColor = Color.White;
+                    BottomArrowPicture.BackColor = Color.White;
+                    break;
+                case 20:
+                    LeftArrowPicture.BackColor = Color.White;
+                    RightArrowPicture.BackColor = Color.Red;
+                    TopArrowPicture.BackColor = Color.White;
+                    BottomArrowPicture.BackColor = Color.White;
+                    break;
+                case 30:
+                    LeftArrowPicture.BackColor = Color.White;
+                    RightArrowPicture.BackColor = Color.White;
+                    TopArrowPicture.BackColor = Color.Red;
+                    BottomArrowPicture.BackColor = Color.White;
+                    break;
+                case 40:
+                    LeftArrowPicture.BackColor = Color.White;
+                    RightArrowPicture.BackColor = Color.White;
+                    TopArrowPicture.BackColor = Color.White;
+                    BottomArrowPicture.BackColor = Color.Red;
+                    break;
+                case 50:
+                    LeftArrowPicture.BackColor = Color.White;
+                    RightArrowPicture.BackColor = Color.White;
+                    TopArrowPicture.BackColor = Color.White;
+                    BottomArrowPicture.BackColor = Color.White;
+                    break;
+            }
+
         }
     }
 }

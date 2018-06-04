@@ -118,7 +118,10 @@ namespace FaceRecogniser
             return frameInfo;
         }
 
-        
+        public void StartVoidCapture(object sender, EventArgs e)
+        {
+            StartCapture();
+        }
 
     }
 }
