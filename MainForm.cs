@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -18,13 +17,17 @@ namespace FaceRecogniser
         HaarCascade face;
         List<Image<Gray, byte>> trainingImages = new List<Image<Gray, byte>>();
         List<string> labels= new List<string>();
-        
-        int NumLabels, t;
+        private Image<Gray, byte> TrainedFace = null;
+        int NumLabels, t, ContTrain;
+        private Image<Gray, byte> gray = null;
+        private Image<Gray, byte> result;
+        private Image<Bgr, Byte> currentFrame;
         EventHandler IdleEvenHandler;
 
         public MainForm()
         {
             InitializeComponent();
+            
             //Load haarcascades for face detection
             face = new HaarCascade("haarcascade_frontalface_default.xml");
             try
@@ -35,7 +38,7 @@ namespace FaceRecogniser
                 NumLabels = Convert.ToInt16(Labels[0]);
                 //ContTrain = NumLabels;
                 string LoadFaces;
-
+                ContTrain = NumLabels;
                 for (int tf = 1; tf < NumLabels+1; tf++)
                 {
                     LoadFaces = "face" + tf + ".bmp";
@@ -75,54 +78,8 @@ namespace FaceRecogniser
             var tForm = new TrainingForm(this);
             tForm.Show();
             /* 
-            try
-            {
-                //Trained face counter
-                ContTrain = ContTrain + 1;
-
-                //Get a gray frame from capture device
-                gray = grabber.QueryGrayFrame().Resize(320, 240, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
-
-                //Face Detector
-                MCvAvgComp[][] facesDetected = gray.DetectHaarCascade(
-                face,
-                1.2,
-                10,
-                Emgu.CV.CvEnum.HAAR_DETECTION_TYPE.DO_CANNY_PRUNING,
-                new Size(20, 20));
-
-                //Action for each element detected
-                foreach (MCvAvgComp f in facesDetected[0])
-                {
-                    TrainedFace = currentFrame.Copy(f.rect).Convert<Gray, byte>();
-                    break;
-                }
-
-                //resize face detected image for force to compare the same size with the 
-                //test image with cubic interpolation type method
-                TrainedFace = result.Resize(100, 100, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
-                trainingImages.Add(TrainedFace);
-                labels.Add(AddNameTextBox.Text);
-
-                //Show face added in gray scale
-                AddFaceImgBox.Image = TrainedFace;
-
-                //Write the number of triained faces in a file text for further load
-                File.WriteAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt", trainingImages.ToArray().Length.ToString() + "%");
-
-                //Write the labels of triained faces in a file text for further load
-                for (int i = 1; i < trainingImages.ToArray().Length + 1; i++)
-                {
-                    trainingImages.ToArray()[i - 1].Save(Application.StartupPath + "/TrainedFaces/face" + i + ".bmp");
-                    File.AppendAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt", labels.ToArray()[i - 1] + "%");
-                }
-
-                MessageBox.Show(AddNameTextBox.Text + "´s face detected and added :)", "Training OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch
-            {
-                MessageBox.Show("Enable the face detection first", "Training Fail", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
+            
+            
             */
         }
 
@@ -220,6 +177,67 @@ namespace FaceRecogniser
 
             RunButton.Enabled = true;
             StopButton.Enabled = false;
+        }
+
+        public void NoPersonAlarm()
+        {
+            Application.Idle -= IdleEvenHandler;
+            grabber.Dispose();
+            imageBoxFrameGrabber.Image = null;
+
+            RunButton.Enabled = true;
+            StopButton.Enabled = false;
+            MessageBox.Show("No persons on capture!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        }
+
+        public void AddExtraTrainigFace()
+        {
+            try
+            {
+
+                //Trained face counter
+                ContTrain = ContTrain + 1;
+
+                //Get a gray frame from capture device
+                gray = grabber.QueryGrayFrame().Resize(320, 240, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
+
+                //Face Detector
+                MCvAvgComp[][] facesDetected = gray.DetectHaarCascade(
+                face,
+                1.2,
+                10,
+                Emgu.CV.CvEnum.HAAR_DETECTION_TYPE.DO_CANNY_PRUNING,
+                new Size(20, 20));
+
+                //Action for each element detected
+                foreach (MCvAvgComp f in facesDetected[0])
+                {
+                    TrainedFace = currentFrame.Copy(f.rect).Convert<Gray, byte>();
+                    break;
+                }
+
+                //resize face detected image for force to compare the same size with the 
+                //test image with cubic interpolation type method
+                TrainedFace = result.Resize(100, 100, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
+                trainingImages.Add(TrainedFace);
+                labels.Add(AddNameTextBox.Text);
+
+                //Write the number of triained faces in a file text for further load
+                File.WriteAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt", trainingImages.ToArray().Length.ToString() + "%");
+
+                //Write the labels of triained faces in a file text for further load
+                for (int i = 1; i < trainingImages.ToArray().Length + 1; i++)
+                {
+                    trainingImages.ToArray()[i - 1].Save(Application.StartupPath + "/TrainedFaces/face" + i + ".bmp");
+                    File.AppendAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt", labels.ToArray()[i - 1] + "%");
+                }
+
+                
+            }
+            catch
+            {
+                MessageBox.Show("Enable the face detection first", "Training Fail", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
         }
     }
 }

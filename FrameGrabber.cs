@@ -25,6 +25,7 @@ namespace FaceRecogniser
         private int t;
         private string name;
         private string names = null;
+        private int NoPersonWarning;
 
         public FrameGrabber(Capture gbr, HaarCascade face, List<Image<Gray, byte>> tImages, int numLabels, List<string> lbls, MainForm mainForm)
         {
@@ -99,10 +100,12 @@ namespace FaceRecogniser
             //Names concatenation of persons recognized
             for (int nnn = 0; nnn < facesDetected[0].Length; nnn++)
             {
+                NoPersonWarning = 0;
                 names = names + NamePersons[nnn] + ", ";
             }
             //Show the faces procesed and recognized
             _mainForm.UpdateForm(currentFrame, names);
+            if (NoPersonWarning == 50) _mainForm.NoPersonAlarm();
             names = "";
             //Clear the list(vector) of names
             NamePersons.Clear();
