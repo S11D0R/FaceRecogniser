@@ -13,30 +13,39 @@ namespace FaceRecogniser
 {
     public partial class MainForm : Form
     {
+        //Объект захвата видеопотока с камеры 
         Capture grabber;
+        //Каскад Хаара для детектирования лица
         HaarCascade face;
+        //Тренировочные изображения
         List<Image<Gray, byte>> trainingImages = new List<Image<Gray, byte>>();
+        //Подписи к тренировочным изображениям
         List<string> labels= new List<string>();
+        //Тренировочное изображение
         private Image<Gray, byte> TrainedFace = null;
+        //Служебные счетчики
         int NumLabels, t, ContTrain;
+        //Изображение в градациях серого
         private Image<Gray, byte> gray = null;
+        //Изображение с выделенными и распознаными лицами
         private Image<Gray, byte> result;
+        //Текущий захваченный кадр
         private Image<Bgr, Byte> currentFrame;
+        //Обработчик простоя
         EventHandler IdleEvenHandler;
 
         public MainForm()
         {
+            //Инициализация при запуске. 
             InitializeComponent();
-            
-            //Load haarcascades for face detection
+            //Загрузка необходимого каскада
             face = new HaarCascade("haarcascade_frontalface_default.xml");
             try
             {
-                //Load of previous trainned faces and labels for each image
+                //Загрузка тренировочной базы
                 string Labelsinfo = File.ReadAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt");
                 string[] Labels = Labelsinfo.Split('%');
                 NumLabels = Convert.ToInt16(Labels[0]);
-                //ContTrain = NumLabels;
                 string LoadFaces;
                 ContTrain = NumLabels;
                 for (int tf = 1; tf < NumLabels+1; tf++)
@@ -53,8 +62,9 @@ namespace FaceRecogniser
             }
 
         }
-
-
+        /// <summary>
+        /// Обработчик кнопки запуска распознавания. 
+        /// </summary>
         private void RunButton_Click(object sender, EventArgs e)
         {
             //Initialize the capture device
@@ -66,109 +76,40 @@ namespace FaceRecogniser
             RunButton.Enabled = false;
             StopButton.Enabled = true;
         }
-
+        /// <summary>
+        /// Обработчик кнопки останова распознавания. 
+        /// </summary>
         private void StopButton_Click(object sender, EventArgs e)
         {
             StopRecogniser();
         }
-
+        /// <summary>
+        /// Обработчик кнопки добавления нового лица пользователя. 
+        /// </summary>
         private void AddFaceButton_Click(object sender, System.EventArgs e)
         {
             if (StopButton.Enabled) StopRecogniser();
             var tForm = new TrainingForm(this);
             tForm.Show();
-            /* 
-            
-            
-            */
         }
-
-        /*
-        void FrameGrabber(object sender, EventArgs e)
-        {
-            AmountCounter.Text = "0";
-            //label4.Text = "";
-            NamePersons.Add("");
-
-
-            //Get the current frame form capture device
-            currentFrame = grabber.QueryFrame().Resize(640, 480, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
-
-            //Convert it to Grayscale
-            gray = currentFrame.Convert<Gray, Byte>();
-
-                    //Face Detector
-                    MCvAvgComp[][] facesDetected = gray.DetectHaarCascade(
-                  face,
-                  1.2,
-                  10,
-                  Emgu.CV.CvEnum.HAAR_DETECTION_TYPE.DO_CANNY_PRUNING,
-                  new Size(20, 20));
-
-                    //Action for each element detected
-                    foreach (MCvAvgComp f in facesDetected[0])
-                    {
-                        t = t + 1;
-                        result = currentFrame.Copy(f.rect).Convert<Gray, byte>().Resize(100, 100, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
-                        //draw the face detected in the 0th (gray) channel with blue color
-                        currentFrame.Draw(f.rect, new Bgr(Color.Red), 2);
-
-
-                        if (trainingImages.ToArray().Length != 0)
-                        {
-                            //TermCriteria for face recognition with numbers of trained images like maxIteration
-                        MCvTermCriteria termCrit = new MCvTermCriteria(ContTrain, 0.001);
-
-                        //Eigen face recognizer
-                        EigenObjectRecognizer recognizer = new EigenObjectRecognizer(
-                           trainingImages.ToArray(),
-                           labels.ToArray(),
-                           3000,
-                           ref termCrit);
-
-                        name = recognizer.Recognize(result);
-
-                            //Draw the label for each face detected and recognized
-                        currentFrame.Draw(name, ref font, new Point(f.rect.X - 2, f.rect.Y - 2), new Bgr(Color.LightGreen));
-
-                        }
-
-                            NamePersons[t-1] = name;
-                            NamePersons.Add("");
-
-
-                        //Set the number of faces detected on the scene
-                        AmountCounter.Text = facesDetected[0].Length.ToString();
-                       
-                    }
-                        t = 0;
-
-                        //Names concatenation of persons recognized
-                    for (int nnn = 0; nnn < facesDetected[0].Length; nnn++)
-                    {
-                        names = names + NamePersons[nnn] + ", ";
-                    }
-                    //Show the faces procesed and recognized
-                    imageBoxFrameGrabber.Image = currentFrame;
-                    label4.Text = names;
-                    names = "";
-                    //Clear the list(vector) of names
-                    NamePersons.Clear();
-
-                }
-        */
-
+        /// <summary>
+        /// Установка счетчика детектированных лиц. 
+        /// </summary>
         public void SetAmount(string am)
         {
             AmountCounter.Text = am;
         }
-
+        /// <summary>
+        /// Обновление кадра и подписей. 
+        /// </summary>
         public void UpdateForm(Image<Bgr, Byte> cFrame, string sNames)
         {
             imageBoxFrameGrabber.Image = cFrame;
             label4.Text = sNames;
         }
-
+        /// <summary>
+        /// Останов распознавания. 
+        /// </summary>
         public void StopRecogniser()
         {
             Application.Idle -= IdleEvenHandler;
@@ -178,7 +119,9 @@ namespace FaceRecogniser
             RunButton.Enabled = true;
             StopButton.Enabled = false;
         }
-
+        /// <summary>
+        /// Сообщение о длительном выходе человека из кадра. 
+        /// </summary>
         public void NoPersonAlarm()
         {
             Application.Idle -= IdleEvenHandler;
@@ -189,50 +132,39 @@ namespace FaceRecogniser
             StopButton.Enabled = false;
             MessageBox.Show("No persons on capture!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
-
+        /// <summary>
+        /// Добавление дополнительного лица к тренировочной базе пользователя. 
+        /// </summary>
         public void AddExtraTrainigFace()
         {
             try
             {
-
-                //Trained face counter
+                //Увеличение счетчика тренировочных объектов
                 ContTrain = ContTrain + 1;
-
-                //Get a gray frame from capture device
+                //Полечение черно-белого изображения с камеры
                 gray = grabber.QueryGrayFrame().Resize(320, 240, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
-
-                //Face Detector
+                //Детектирование лиц
                 MCvAvgComp[][] facesDetected = gray.DetectHaarCascade(
                 face,
                 1.2,
                 10,
                 Emgu.CV.CvEnum.HAAR_DETECTION_TYPE.DO_CANNY_PRUNING,
                 new Size(20, 20));
-
-                //Action for each element detected
                 foreach (MCvAvgComp f in facesDetected[0])
                 {
                     TrainedFace = currentFrame.Copy(f.rect).Convert<Gray, byte>();
                     break;
                 }
-
-                //resize face detected image for force to compare the same size with the 
-                //test image with cubic interpolation type method
                 TrainedFace = result.Resize(100, 100, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
                 trainingImages.Add(TrainedFace);
                 labels.Add(AddNameTextBox.Text);
-
-                //Write the number of triained faces in a file text for further load
+                //Изменеие файлов тренировочно базы
                 File.WriteAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt", trainingImages.ToArray().Length.ToString() + "%");
-
-                //Write the labels of triained faces in a file text for further load
                 for (int i = 1; i < trainingImages.ToArray().Length + 1; i++)
                 {
                     trainingImages.ToArray()[i - 1].Save(Application.StartupPath + "/TrainedFaces/face" + i + ".bmp");
                     File.AppendAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt", labels.ToArray()[i - 1] + "%");
                 }
-
-                
             }
             catch
             {

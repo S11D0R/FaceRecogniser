@@ -23,10 +23,10 @@ namespace FaceRecogniser
         private List<Image<Gray, byte>> trainingImages = new List<Image<Gray, byte>>();
         private List<string> labels = new List<string>();
         private int NumLabels, t;
-
+        //Флаг разрешения тренировки
         private bool captureAllowed = true;
+        //Количество тренировочных изображений
         private const int TrainingSetMax = 50;
-
         EventHandler IdleEvenHandler;
         public TrainingForm(MainForm f)
         {
@@ -34,25 +34,24 @@ namespace FaceRecogniser
             InitializeGrabber();
             MainFormPtr = f;
         }
-
+        //Инициализация обработчика распознавания
         private void InitializeGrabber()
         {
-            //Initialize the capture device
             TrainingGrabber = new Capture();
             tCapture = new TrainingCapture(TrainingGrabber, face, trainingImages, NumLabels, labels, this);
             StartCapture();
         }
-
+        //Запуск вывода резкльтата распознавания
         private void StartCapture()
         {
             Application.Idle += IdleEvenHandler = new EventHandler(tCapture.StartVoidCapture);
         }
-
+        //Установцик счетчика детектированных лиц
         public void SetAmount(string am)
         {
             AmountCounter.Text = am;
         }
-
+        //Обработчик кнопки старта тренировки
         private void StartTrainingButton_Click(object sender, EventArgs e)
         {
             captureAllowed = false;
@@ -69,7 +68,7 @@ namespace FaceRecogniser
                 ContTrain = fInfo.getNumLabels();
                 result = fInfo.getResult();
                 currentFrame = fInfo.getCurrentFrame();
-                //if (fInfo.AllowTraining() == false) break;
+                //Проверка на выполнение требований к тренировочному кадру
                 while (fInfo.AllowTraining() == false)
                 {
                     System.Threading.Thread.Sleep(5);
@@ -78,63 +77,47 @@ namespace FaceRecogniser
                     result = fInfo.getResult();
                     currentFrame = fInfo.getCurrentFrame();
                 }
-
                 FieldLight(k);
                     try
                     {
-                        //Trained face counter
+                        //Счетчик Тренировочных лиц 
                         ContTrain = ContTrain + 1;
-
-                        //Get a gray frame from capture device
-                        //gray = grabber.QueryGrayFrame().Resize(320, 240, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
+                        //Получение кадра в градациях серого
                         gray = currentFrame.Convert<Gray, Byte>();
-                        //Face Detector
+                        //Детектирование лиц
                         MCvAvgComp[][] facesDetected = gray.DetectHaarCascade(
                         face,
                         1.2,
                         10,
                         Emgu.CV.CvEnum.HAAR_DETECTION_TYPE.DO_CANNY_PRUNING,
                         new Size(20, 20));
-
-                        //Action for each element detected
                         foreach (MCvAvgComp f in facesDetected[0])
                         {
                             TrainedFace = currentFrame.Copy(f.rect).Convert<Gray, byte>();
                             break;
                         }
-
-                        //resize face detected image for force to compare the same size with the 
-                        //test image with cubic interpolation type method
                         TrainedFace = result.Resize(100, 100, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
                         trainingImages.Add(TrainedFace);
-                        
-
-                        //Write the number of triained faces in a file text for further load
+                        //Работа с фалами тренировочной базы
                         File.WriteAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt", trainingImages.ToArray().Length.ToString() + "%");
-
-                        //Write the labels of triained faces in a file text for further load
                         for (int i = 1; i < trainingImages.ToArray().Length + 1; i++)
                         {
                             trainingImages.ToArray()[i - 1].Save(Application.StartupPath + "/TrainedFaces/face" + i + ".bmp");
                             File.AppendAllText(Application.StartupPath + "/TrainedFaces/TrainedLabels.txt", labels.ToArray()[i - 1] + "%");
                         }
-                        
                     }
                     catch
                     {
                         MessageBox.Show("Enable the face detection first", "Training Fail", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     }
-                
-
-
             }
         }
-
+        //Обновление кадра
         public void UpdateForm(Image<Bgr, Byte> cFrame)
         {
             imageBoxFrameGrabber.Image = cFrame;
         }
-
+        //Обработка подсветки сторон
         private void FieldLight(int iter)
         {
             switch (iter)

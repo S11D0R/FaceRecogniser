@@ -5,51 +5,46 @@ using Emgu.CV.Structure;
 namespace Emgu.CV
 {
    /// <summary>
-   /// An object recognizer using PCA (Principle Components Analysis)
+   /// Распознавание лиц с использованием метода PCA 
    /// </summary>
    [Serializable]
    public class EigenObjectRecognizer
    {
+      //Ихображения для обработки
       private Image<Gray, Single>[] _eigenImages;
+      //Среднее тренировочных изображений
       private Image<Gray, Single> _avgImage;
+      //Матрица единиц совпадения изображений
       private Matrix<float>[] _eigenValues;
+      //Метки изображений
       private string[] _labels;
+      //Полоса пропускания для совпадения изображений
       private double _eigenDistanceThreshold;
-
-      /// <summary>
-      /// Get the eigen vectors that form the eigen space
-      /// </summary>
-      /// <remarks>The set method is primary used for deserialization, do not attemps to set it unless you know what you are doing</remarks>
+      //Массив изображений для обработки
       public Image<Gray, Single>[] EigenImages
       {
          get { return _eigenImages; }
          set { _eigenImages = value; }
       }
-
       /// <summary>
-      /// Get or set the labels for the corresponding training image
+      /// Установка подписей к изображениям
       /// </summary>
       public String[] Labels
       {
          get { return _labels; }
          set { _labels = value; }
       }
-
       /// <summary>
-      /// Get or set the eigen distance threshold.
-      /// The smaller the number, the more likely an examined image will be treated as unrecognized object. 
-      /// Set it to a huge number (e.g. 5000) and the recognizer will always treated the examined image as one of the known object. 
+      /// Изменение или получение совпадения при сравнении
       /// </summary>
       public double EigenDistanceThreshold
       {
          get { return _eigenDistanceThreshold; }
          set { _eigenDistanceThreshold = value; }
       }
-
       /// <summary>
-      /// Get the average Image. 
+      /// Изменеие или получение среднего из тренировочной базы. 
       /// </summary>
-      /// <remarks>The set method is primary used for deserialization, do not attemps to set it unless you know what you are doing</remarks>
       public Image<Gray, Single> AverageImage
       {
          get { return _avgImage; }
@@ -57,30 +52,24 @@ namespace Emgu.CV
       }
 
       /// <summary>
-      /// Get the eigen values of each of the training image
+      /// Изменеие или получение совпадения для каждого изображения. 
       /// </summary>
-      /// <remarks>The set method is primary used for deserialization, do not attemps to set it unless you know what you are doing</remarks>
-      public Matrix<float>[] EigenValues
+        public Matrix<float>[] EigenValues
       {
          get { return _eigenValues; }
          set { _eigenValues = value; }
       }
-
+      //Конструктор
       private EigenObjectRecognizer()
       {
       }
-
-
       /// <summary>
-      /// Create an object recognizer using the specific tranning data and parameters, it will always return the most similar object
+      /// Конструктор с параметрами
       /// </summary>
-      /// <param name="images">The images used for training, each of them should be the same size. It's recommended the images are histogram normalized</param>
-      /// <param name="termCrit">The criteria for recognizer training</param>
       public EigenObjectRecognizer(Image<Gray, Byte>[] images, ref MCvTermCriteria termCrit)
          : this(images, GenerateLabels(images.Length), ref termCrit)
       {
       }
-
       private static String[] GenerateLabels(int size)
       {
          String[] labels = new string[size];
@@ -88,84 +77,52 @@ namespace Emgu.CV
             labels[i] = i.ToString();
          return labels;
       }
-
-      /// <summary>
-      /// Create an object recognizer using the specific tranning data and parameters, it will always return the most similar object
-      /// </summary>
-      /// <param name="images">The images used for training, each of them should be the same size. It's recommended the images are histogram normalized</param>
-      /// <param name="labels">The labels corresponding to the images</param>
-      /// <param name="termCrit">The criteria for recognizer training</param>
-      public EigenObjectRecognizer(Image<Gray, Byte>[] images, String[] labels, ref MCvTermCriteria termCrit)
+        /// <summary>
+        /// Конструктор с параметрами
+        /// </summary>
+        public EigenObjectRecognizer(Image<Gray, Byte>[] images, String[] labels, ref MCvTermCriteria termCrit)
          : this(images, labels, 0, ref termCrit)
       {
       }
 
-      /// <summary>
-      /// Create an object recognizer using the specific tranning data and parameters
-      /// </summary>
-      /// <param name="images">The images used for training, each of them should be the same size. It's recommended the images are histogram normalized</param>
-      /// <param name="labels">The labels corresponding to the images</param>
-      /// <param name="eigenDistanceThreshold">
-      /// The eigen distance threshold, (0, ~1000].
-      /// The smaller the number, the more likely an examined image will be treated as unrecognized object. 
-      /// If the threshold is &lt; 0, the recognizer will always treated the examined image as one of the known object. 
-      /// </param>
-      /// <param name="termCrit">The criteria for recognizer training</param>
-      public EigenObjectRecognizer(Image<Gray, Byte>[] images, String[] labels, double eigenDistanceThreshold, ref MCvTermCriteria termCrit)
-      {
-         Debug.Assert(images.Length == labels.Length, "The number of images should equals the number of labels");
-         Debug.Assert(eigenDistanceThreshold >= 0.0, "Eigen-distance threshold should always >= 0.0");
-
-         CalcEigenObjects(images, ref termCrit, out _eigenImages, out _avgImage);
-
-         /*
-         _avgImage.SerializationCompressionRatio = 9;
-
-         foreach (Image<Gray, Single> img in _eigenImages)
-             //Set the compression ration to best compression. The serialized object can therefore save spaces
-             img.SerializationCompressionRatio = 9;
-         */
-
-         _eigenValues = Array.ConvertAll<Image<Gray, Byte>, Matrix<float>>(images,
-             delegate(Image<Gray, Byte> img)
-             {
-                return new Matrix<float>(EigenDecomposite(img, _eigenImages, _avgImage));
-             });
-
-         _labels = labels;
-
-         _eigenDistanceThreshold = eigenDistanceThreshold;
-      }
+        /// <summary>
+        /// Конструктор с параметрами
+        /// </summary>
+        /// <param name="eigenDistanceThreshold"> Отвечает за точность распознавания (0, ~1000]
+        public EigenObjectRecognizer(Image<Gray, Byte>[] images, String[] labels, double eigenDistanceThreshold, ref MCvTermCriteria termCrit)
+        {
+            Debug.Assert(images.Length == labels.Length, "The number of images should equals the number of labels");
+            Debug.Assert(eigenDistanceThreshold >= 0.0, "Eigen-distance threshold should always >= 0.0");
+            CalcEigenObjects(images, ref termCrit, out _eigenImages, out _avgImage);
+            _eigenValues = Array.ConvertAll<Image<Gray, Byte>, Matrix<float>>(images,
+                delegate(Image<Gray, Byte> img)
+                {
+                   return new Matrix<float>(EigenDecomposite(img, _eigenImages, _avgImage));
+                });
+            _labels = labels;
+            _eigenDistanceThreshold = eigenDistanceThreshold;
+        }
 
       #region static methods
       /// <summary>
-      /// Caculate the eigen images for the specific traning image
+      /// Вычисление среднего из тренировочной базы
       /// </summary>
-      /// <param name="trainingImages">The images used for training </param>
-      /// <param name="termCrit">The criteria for tranning</param>
-      /// <param name="eigenImages">The resulting eigen images</param>
-      /// <param name="avg">The resulting average image</param>
+      /// <param name="avg">Результирующее среднее</param>
       public static void CalcEigenObjects(Image<Gray, Byte>[] trainingImages, ref MCvTermCriteria termCrit, out Image<Gray, Single>[] eigenImages, out Image<Gray, Single> avg)
       {
          int width = trainingImages[0].Width;
          int height = trainingImages[0].Height;
-
          IntPtr[] inObjs = Array.ConvertAll<Image<Gray, Byte>, IntPtr>(trainingImages, delegate(Image<Gray, Byte> img) { return img.Ptr; });
-
          if (termCrit.max_iter <= 0 || termCrit.max_iter > trainingImages.Length)
             termCrit.max_iter = trainingImages.Length;
-         
          int maxEigenObjs = termCrit.max_iter;
-
          #region initialize eigen images
          eigenImages = new Image<Gray, float>[maxEigenObjs];
          for (int i = 0; i < eigenImages.Length; i++)
             eigenImages[i] = new Image<Gray, float>(width, height);
          IntPtr[] eigObjs = Array.ConvertAll<Image<Gray, Single>, IntPtr>(eigenImages, delegate(Image<Gray, Single> img) { return img.Ptr; });
          #endregion
-
          avg = new Image<Gray, Single>(width, height);
-
          CvInvoke.cvCalcEigenObjects(
              inObjs,
              ref termCrit,
@@ -173,14 +130,9 @@ namespace Emgu.CV
              null,
              avg.Ptr);
       }
-
       /// <summary>
-      /// Decompose the image as eigen values, using the specific eigen vectors
+      /// Вычисление декомпозиции изображений
       /// </summary>
-      /// <param name="src">The image to be decomposed</param>
-      /// <param name="eigenImages">The eigen images</param>
-      /// <param name="avg">The average images</param>
-      /// <returns>Eigen values of the decomposed image</returns>
       public static float[] EigenDecomposite(Image<Gray, Byte> src, Image<Gray, Single>[] eigenImages, Image<Gray, Single> avg)
       {
          return CvInvoke.cvEigenDecomposite(
@@ -189,12 +141,9 @@ namespace Emgu.CV
              avg.Ptr);
       }
       #endregion
-
       /// <summary>
-      /// Given the eigen value, reconstruct the projected image
+      /// Вычисление проекций изображений
       /// </summary>
-      /// <param name="eigenValue">The eigen values</param>
-      /// <returns>The projected image</returns>
       public Image<Gray, Byte> EigenProjection(float[] eigenValue)
       {
          Image<Gray, Byte> res = new Image<Gray, byte>(_avgImage.Width, _avgImage.Height);
@@ -205,12 +154,11 @@ namespace Emgu.CV
              res.Ptr);
          return res;
       }
-
       /// <summary>
-      /// Get the Euclidean eigen-distance between <paramref name="image"/> and every other image in the database
+      /// Вычислет различие между заданным изображением и изображениями тренировочной базы
       /// </summary>
-      /// <param name="image">The image to be compared from the training images</param>
-      /// <returns>An array of eigen distance from every image in the training images</returns>
+      /// <param name="image">Заданное изображение</param>
+      /// <returns>Массив различительных величин</returns>
       public float[] GetEigenDistances(Image<Gray, Byte> image)
       {
          using (Matrix<float> eigenValue = new Matrix<float>(EigenDecomposite(image, _eigenImages, _avgImage)))
@@ -220,14 +168,9 @@ namespace Emgu.CV
                    return (float)CvInvoke.cvNorm(eigenValue.Ptr, eigenValueI.Ptr, Emgu.CV.CvEnum.NORM_TYPE.CV_L2, IntPtr.Zero);
                 });
       }
-
       /// <summary>
-      /// Given the <paramref name="image"/> to be examined, find in the database the most similar object, return the index and the eigen distance
+      /// Поиск самого похожего объекта по тренировочной базе
       /// </summary>
-      /// <param name="image">The image to be searched from the database</param>
-      /// <param name="index">The index of the most similar object</param>
-      /// <param name="eigenDistance">The eigen distance of the most similar object</param>
-      /// <param name="label">The label of the specific image</param>
       public void FindMostSimilarObject(Image<Gray, Byte> image, out int index, out float eigenDistance, out String label)
       {
          float[] dist = GetEigenDistances(image);
@@ -244,15 +187,9 @@ namespace Emgu.CV
          }
          label = Labels[index];
       }
-
-      /// <summary>
-      /// Try to recognize the image and return its label
+        /// <summary>
+      /// Распознавание изображения, возвращает метку распознанного изображения, либо пустую строку
       /// </summary>
-      /// <param name="image">The image to be recognized</param>
-      /// <returns>
-      /// String.Empty, if not recognized;
-      /// Label of the corresponding image, otherwise
-      /// </returns>
       public String Recognize(Image<Gray, Byte> image)
       {
          int index;
